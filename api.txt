@@ -5,3 +5,49 @@ video schema:
 	description: string, not required
 	timestamp: string, given
 	votes: number, set to 0
+
+category schema:
+	name: string, required
+
+
+GET 
+/videos (implemented)
+	Get all videos
+
+GET
+/videos/:videoId (implemented)
+	Get single video
+
+GET
+/videos/category/:categoryId  (implemented)
+	Get all videos for a category
+
+GET
+/videos/category/:categoryId?top=true  (implemented)
+	Get top videos for a category
+
+GET
+/categories   (implemented)
+	Get all categories
+
+GET
+/categories/:categoryId   
+	Get single category
+
+POST
+/videos  (implemented)
+	Post a new video 
+
+POST
+/videos/:videoId/vote?up=true  (implemented)
+	Post an upvote to a video
+
+POST
+/videos/:videoId/vote?up=false  (implemented)
+	Post an upvote to a video
+
+POST
+/categories   (implemented)
+	Post a new category
+
+
