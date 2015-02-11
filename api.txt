@@ -1,0 +1,7 @@
+video schema:
+	name: string, required
+	url: string, required
+	categoryId: string, required
+	description: string, not required
+	timestamp: string, given
+	votes: number, set to 0
