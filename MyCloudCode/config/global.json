@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "VideatoAPI": {
+            "applicationId": "OynHHBhtYiHeKmTt1tj4ZjloR9TVXI9az7fEGiJi", 
+            "masterKey": "yqed7BHhKm4P0GtWCjM8bydVUdaPsnN8MiwnQPb0"
+        }, 
+        "_default": {
+            "link": "VideatoAPI"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.4"
+    }
+}
