@@ -34,5 +34,4 @@ Parse.Cloud.beforeSave("Category", function(request, response) {
 			}
 		});
 	}
-
 });
