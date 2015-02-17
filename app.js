@@ -17,10 +17,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.all('/', function(req, res, next) {
+app.all('*', function(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
   res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, content-type");
+
+  console.log("Here");
   next();
  });
 
