@@ -52,7 +52,7 @@ router.get('/:videoId', function(req, res) {
 			}
 		},
 		error: function(error) {
-			response.error("Could not get video with id " + req.params.videoId + ": " + error);
+			res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error.message);
 		}
 	});
 });
@@ -121,10 +121,16 @@ router.post('/:videoId/vote', function(req, res) {
 	console.log("POST: ");
 	console.log(req.body);
 
-	var query = new Parse.Query("Video");
+	var videoQuery = new Parse.Query("Video");
+	var ip = req.headers['x-forwarded-for'] || 
+    req.connection.remoteAddress || 
+    req.socket.remoteAddress ||
+  	 req.connection.socket.remoteAddress;
 
-	query.equalTo("objectId", req.params.videoId);
-	query.first({
+  	console.log("IP Address: " + ip);
+
+	videoQuery.equalTo("objectId", req.params.videoId);
+	videoQuery.first({
 		success: function(video) {
 			if (!video) {
 				res.status(500).send("Must supply a valid video id");
@@ -132,18 +138,27 @@ router.post('/:videoId/vote', function(req, res) {
 			if (!req.query.up) {
 				res.status(500).send("Must supply a query paramater 'up' that is set to true or false");
 			}
-			
-			if (req.query.up === "true") {
-				video.increment("votes");
+
+			console.log(JSON.stringify(video));
+
+			if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { //doesnt contain ip
+				video.addUnique("ips", ip);
+
+				if (req.query.up === "true") {
+					video.increment("votes");
+				} else {
+					video.decrement("votes");
+				}
+
+				video.save();
+				res.send(video);
 			} else {
-				video.decrement("votes");
+				res.status(500).send("This ip address: " + ip + " has already voted for the video");
 			}
 
-			video.save();
-			res.send(video);
 		},
 		error: function(error) {
-			response.error("Could not get video with id " + req.params.videoId + ": " + error);
+			res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error);
 		}
 	});
 });
