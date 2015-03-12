@@ -24,7 +24,7 @@ app.all('*', function(req, res, next) {
 
   console.log("Here");
   next();
- });
+});
 
 app.use('/videos', videos);
 app.use('/categories', categories);

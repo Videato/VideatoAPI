@@ -20,11 +20,11 @@ router.get('/', function(req, res) {
 	    		resultList.push(results[i]);
 	    	}
 
-	    	res.send(resultList);
+	    	return res.send(resultList);
 	  	},
 	  	error: function(error) {
 	   	console.log("Error getting categories: " + error.code + " " + error.message);
-	   	res.status(500).send(error.message);
+	   	return res.status(500).send(error.message);
 	  	}
 	});
 });
@@ -41,11 +41,11 @@ router.post('/', function(req, res) {
 	category.save(null, {
 		success: function(category) {
 	    	console.log('New object created with objectId: ' + category.id);
-	    	res.send(category);
+	    	return res.send(category);
  		},
  		error: function(category, error) {
  			console.log('Failed to create new object, with error code: ' + error.message);
- 			res.status(500).send(error.message);
+ 			return res.status(500).send(error.message);
  		}
 	});
 });

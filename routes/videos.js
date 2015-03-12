@@ -28,11 +28,11 @@ router.get('/', function(req, res) {
 	    		resultList.push(results[i]);
 	    	}
 
-	    	res.send(resultList);
+	    	return res.send(resultList);
 	  	},
 	  	error: function(error) {
 	   	console.log("Error getting videos: " + error.code + " " + error.message);
-	   	res.status(500).send(error.message);
+	   	return res.status(500).send(error.message);
 	  	}
 	});
 });
@@ -46,13 +46,13 @@ router.get('/:videoId', function(req, res) {
 	query.first({
 		success: function(video) {
 			if (!video) {
-				res.status(500).send("Must supply a valid video id");
+				return res.status(500).send("Must supply a valid video id");
 			} else {
-				res.send(video);
+				return res.send(video);
 			}
 		},
 		error: function(error) {
-			res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error.message);
+			return res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error.message);
 		}
 	});
 });
@@ -82,11 +82,11 @@ router.get('/category/:categoryId', function(req, res) {
 	    		resultList.push(results[i]);
 	    	}
 
-	    	res.send(resultList);
+	    	return res.send(resultList);
 	  	},
 	  	error: function(error) {
 	   	console.log("Error getting videos: " + error.code + " " + error.message);
-	   	res.status(500).send(error.message);
+	   	return res.status(500).send(error.message);
 	  	}
 	});
 });
@@ -107,11 +107,11 @@ router.post('/', function(req, res) {
 	video.save(null, {
 		success: function(video) {
 	    	console.log('New object created with objectId: ' + video.id);
-	    	res.send(video);
+	    	return res.send(video);
  		},
  		error: function(video, error) {
  			console.log('Failed to create new object, with error code: ' + error.message);
- 			res.status(500).send(error.message);
+ 			return res.status(500).send(error.message);
  		}
 	});
 });
@@ -133,32 +133,31 @@ router.post('/:videoId/vote', function(req, res) {
 	videoQuery.first({
 		success: function(video) {
 			if (!video) {
-				res.status(500).send("Must supply a valid video id");
+				return res.status(500).send("Must supply a valid video id");
 			} 
 			if (!req.query.up) {
-				res.status(500).send("Must supply a query paramater 'up' that is set to true or false");
+				return res.status(500).send("Must supply a query paramater 'up' that is set to true or false");
 			}
 
-			console.log(JSON.stringify(video));
-
-			if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { //doesnt contain ip
+			//doesnt contain ip
+			if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { 
 				video.addUnique("ips", ip);
 
 				if (req.query.up === "true") {
 					video.increment("votes");
 				} else {
-					video.decrement("votes");
+					video.increment("votes", -1);
 				}
 
 				video.save();
-				res.send(video);
-			} else {
-				res.status(500).send("This ip address: " + ip + " has already voted for the video");
+				return res.send(video);
+			} else { //contains ip
+				return res.status(500).send("This ip address: " + ip + " has already voted for the video");
 			}
 
 		},
 		error: function(error) {
-			res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error);
+			return res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error);
 		}
 	});
 });
