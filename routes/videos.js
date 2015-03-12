@@ -107,6 +107,7 @@ router.post('/', function(req, res) {
 	video.save(null, {
 		success: function(video) {
 	    	console.log('New object created with objectId: ' + video.id);
+
 	    	return res.send(video);
  		},
  		error: function(video, error) {
@@ -122,6 +123,7 @@ router.post('/:videoId/vote', function(req, res) {
 	console.log(req.body);
 
 	var videoQuery = new Parse.Query("Video");
+	var ipQuery = new Parse.Query("VoteIps");
 	var ip = req.headers['x-forwarded-for'] || 
     req.connection.remoteAddress || 
     req.socket.remoteAddress ||
@@ -139,21 +141,45 @@ router.post('/:videoId/vote', function(req, res) {
 				return res.status(500).send("Must supply a query paramater 'up' that is set to true or false");
 			}
 
-			//doesnt contain ip
-			if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { 
-				video.addUnique("ips", ip);
+			ipQuery.equalTo("videoId", video.id);
+			ipQuery.first({
+				success: function(voteIps) {
+					if (!voteIps.get("ips") || !(voteIps.get("ips").indexOf(ip) > -1)) {
+						voteIps.addUnique("ips", ip);
 
-				if (req.query.up === "true") {
-					video.increment("votes");
-				} else {
-					video.increment("votes", -1);
+						if (req.query.up === "true") {
+							video.increment("votes");
+						} else {
+							video.increment("votes", -1);
+						}
+
+						video.save();
+						voteIps.save();
+						return res.send(video);
+					} else {
+						return res.status(500).send("This ip address: " + ip + " has already voted for the video");
+					}
+				},
+				error: function(error) {
+					return res.status(500).send('Bad stuff yo');
 				}
+			});
 
-				video.save();
-				return res.send(video);
-			} else { //contains ip
-				return res.status(500).send("This ip address: " + ip + " has already voted for the video");
-			}
+			// //doesnt contain ip
+			// if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { 
+			// 	video.addUnique("ips", ip);
+
+			// 	if (req.query.up === "true") {
+			// 		video.increment("votes");
+			// 	} else {
+			// 		video.increment("votes", -1);
+			// 	}
+
+			// 	video.save();
+			// 	return res.send(video);
+			// } else { //contains ip
+			// 	return res.status(500).send("This ip address: " + ip + " has already voted for the video");
+			// }
 
 		},
 		error: function(error) {

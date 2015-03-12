@@ -11,6 +11,24 @@ Parse.Cloud.beforeSave("Video", function(request, response) {
 	}
 });
 
+//Add VoteIps object for video
+Parse.Cloud.afterSave("Video", function(request) {
+	var ips = new Parse.Object.extend("VoteIps");
+
+	ips.set("videoId", video.id);
+	ips.set("ips", []);
+
+ 	ips.save(null, {
+ 		success: function(ips) {
+ 			console.log("Success saving video ips");
+ 		},
+ 		error: function(ips, error) {
+ 			console.log("Error saving video ips: " + error.message);
+ 		}
+ 	});
+
+});
+
 // Make sure the Category submitted is valid
 Parse.Cloud.beforeSave("Category", function(request, response) {
 
