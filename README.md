@@ -18,6 +18,10 @@ GET
 	Get all videos
 
 GET
+/videos?search=abc
+	Get all videos with 'abc' in the name or description
+
+GET
 /videos/:videoId
 	Get single video
 

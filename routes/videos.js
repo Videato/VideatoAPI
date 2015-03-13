@@ -19,13 +19,23 @@ router.get('/', function(req, res) {
 
 	var query = new Parse.Query(Video);
 	var resultList = [];
+	var search = req.query.search;
 
 	query.find({
 		success: function(results) {
+			var result;
 	   	console.log("Successfully retrieved " + results.length + " videos.");
 
 	    	for (var i = 0; i < results.length; i++) { 
-	    		resultList.push(results[i]);
+	    		result = results[i];
+
+	    		console.log(result);
+	    		console.log('NAME: ' + result.name);
+
+	    		if (!search || ((result.get("name").indexOf(search) > -1) ||
+	    		 (result.get("description").indexOf(search) > -1))) {
+	    			resultList.push(results[i]);
+	    		}
 	    	}
 
 	    	return res.send(resultList);
@@ -37,6 +47,7 @@ router.get('/', function(req, res) {
 	});
 });
 
+/* GET a specific video by videoId */
 router.get('/:videoId', function(req, res) {
 	console.log("GET: single video");
 
@@ -58,7 +69,6 @@ router.get('/:videoId', function(req, res) {
 });
 
 /* GET all videos within a category */
-
 router.get('/category/:categoryId', function(req, res) {
 	console.log("GET: all videos for a category");
 
@@ -164,23 +174,6 @@ router.post('/:videoId/vote', function(req, res) {
 					return res.status(500).send('Bad stuff yo');
 				}
 			});
-
-			// //doesnt contain ip
-			// if (!video.get("ips") || !(video.get("ips").indexOf(ip) > -1)) { 
-			// 	video.addUnique("ips", ip);
-
-			// 	if (req.query.up === "true") {
-			// 		video.increment("votes");
-			// 	} else {
-			// 		video.increment("votes", -1);
-			// 	}
-
-			// 	video.save();
-			// 	return res.send(video);
-			// } else { //contains ip
-			// 	return res.status(500).send("This ip address: " + ip + " has already voted for the video");
-			// }
-
 		},
 		error: function(error) {
 			return res.status(500).send("Could not get video with id " + req.params.videoId + ": " + error);
