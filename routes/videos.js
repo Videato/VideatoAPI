@@ -74,10 +74,14 @@ router.get('/category/:categoryId', function(req, res) {
 
 	var query = new Parse.Query(Video);
 	var resultList = [];
+	var weekAgo = new Date();
+
+	weekAgo.setDate(weekAgo.getDate() - 7);
 
 	if (req.query.top === "true") {
 		console.log("Top content");
 		query.descending("votes");
+		query.greaterThan("createdAt", weekAgo);
 	} else {
 		query.descending("createdAt");
 	}
