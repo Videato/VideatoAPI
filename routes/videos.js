@@ -13,27 +13,27 @@ var getIp = function(req) {
 
 /* GET all videos */
 
-// Probably will get rid of this call, maybe implement pagination
+// Optional search paramater to filter results
 router.get('/', function(req, res) {
 	console.log("GET: all videos");
 
 	var query = new Parse.Query(Video);
 	var resultList = [];
-	var search = req.query.search;
+	var search = req.query.search.toLowerCase();
 
 	query.find({
 		success: function(results) {
 			var result;
+			var name, description;
 	   	console.log("Successfully retrieved " + results.length + " videos.");
 
 	    	for (var i = 0; i < results.length; i++) { 
 	    		result = results[i];
+	    		name = result.get("name").toLowerCase();
+	    		description = result.get("description").toLowerCase();
 
-	    		console.log(result);
-	    		console.log('NAME: ' + result.name);
-
-	    		if (!search || ((result.get("name").indexOf(search) > -1) ||
-	    		 (result.get("description").indexOf(search) > -1))) {
+	    		if (!search || ((name.indexOf(search) > -1) ||
+	    		 (description.indexOf(search) > -1))) {
 	    			resultList.push(results[i]);
 	    		}
 	    	}
@@ -69,6 +69,10 @@ router.get('/:videoId', function(req, res) {
 });
 
 /* GET all videos within a category */
+
+// Optional top paramter to filter the videos by votes and only 
+// return 10, otherwise all videos will be returned sorted by most
+// recent
 router.get('/category/:categoryId', function(req, res) {
 	console.log("GET: all videos for a category");
 
@@ -132,6 +136,10 @@ router.post('/', function(req, res) {
 });
 
 /* POST a vote to a video */
+
+// Must supplay a paramter up, either set to true or false
+// This paramater determines if the videos gets upvoted or
+// downvoted
 router.post('/:videoId/vote', function(req, res) {
 	console.log("POST: ");
 	console.log(req.body);
