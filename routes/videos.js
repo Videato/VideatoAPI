@@ -19,7 +19,11 @@ router.get('/', function(req, res) {
 
 	var query = new Parse.Query(Video);
 	var resultList = [];
-	var search = req.query.search.toLowerCase();
+	var search;
+
+	if (req.query.search) {
+		search = req.query.search.toLowerCase();
+	}
 
 	query.find({
 		success: function(results) {
