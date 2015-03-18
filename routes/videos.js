@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var Parse = require('parse').Parse;
 var Video = Parse.Object.extend("Video");
+var Video = Parse.Object.extend("Video");
+var VoteIp = Parse.Object.extend("VoteIps");
 
 Parse.initialize("OynHHBhtYiHeKmTt1tj4ZjloR9TVXI9az7fEGiJi", "odyKLYEkPUjj2zPJP1rSgaHiebfFYb4b08Z5IqH1");
 
@@ -128,9 +130,20 @@ router.post('/', function(req, res) {
 
 	video.save(null, {
 		success: function(video) {
+			var voteIp = new VoteIp();
+
 	    	console.log('New object created with objectId: ' + video.id);
 
-	    	return res.send(video);
+	    	voteIp.set("videoId", video.id);
+
+	    	voteIp.save(null, {
+	    		success: function(voteIp) {
+	    			return res.send(video);
+	    		},
+	    		error: function(voteIp, error) {
+	    			return res.status(500).send(error.message);
+	    		}
+	    	});
  		},
  		error: function(video, error) {
  			console.log('Failed to create new object, with error code: ' + error.message);
