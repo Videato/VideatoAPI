@@ -170,6 +170,9 @@ router.post('/:videoId/vote', function(req, res) {
 			ipQuery.equalTo("videoId", video.id);
 			ipQuery.first({
 				success: function(voteIps) {
+					if (!voteIps) {
+						return res.status(500).send("Error voting for video: " + video.id);
+					}
 					if (!voteIps.get("ips") || !(voteIps.get("ips").indexOf(ip) > -1)) {
 						voteIps.addUnique("ips", ip);
 
